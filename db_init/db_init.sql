@@ -3,6 +3,18 @@ BEGIN;
 -- Включаем криптографические функции
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Добавим функцию тгла лайков
+CREATE OR REPLACE FUNCTION toggle_like(user_id INTEGER, post_id INTEGER) RETURNS VOID AS
+$$
+BEGIN
+    IF EXISTS (SELECT 1 FROM likes l WHERE l.user_id = toggle_like.user_id AND l.post_id = toggle_like.post_id) THEN
+        DELETE FROM likes l WHERE l.user_id = toggle_like.user_id AND l.post_id = toggle_like.post_id;
+    ELSE
+        INSERT INTO likes (user_id, post_id) VALUES (toggle_like.user_id, toggle_like.post_id);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Таблица хранения user'ов
 CREATE TABLE IF NOT EXISTS users
 (
