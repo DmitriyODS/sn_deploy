@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  DB:
+    image: postgres:16.1-alpine3.19
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+      PGTZ: Europe/Moscow
+      POSTGRES_USER: idon
+      POSTGRES_PASSWORD: test_db_password
+      POSTGRES_DB: network
+    volumes:
+      - ./db_init:/db_init:ro
+      - ./backups:/backups:rw
+      - psqlData:/var/lib/postgresql/data/:rw
+    ports:
+      - '127.0.0.1:5432:5432'
+    logging:
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+volumes:
+  psqlData:
+    driver: local

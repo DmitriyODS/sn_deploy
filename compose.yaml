@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  DB:
+    image: postgres:16.1-alpine3.19
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+      PGTZ: Europe/Moscow
+      POSTGRES_USER: idon
+      POSTGRES_PASSWORD: test_db_password
+      POSTGRES_DB: network
+    volumes:
+      - ./db_init:/db_init:ro
+      - ./backups:/backups:rw
+      - psqlData:/var/lib/postgresql/data/:rw
+    ports:
+      - '5432:5432'
+    networks:
+      - network-net
+    logging:
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+  crmService:
+    image: "osipovskijdima/hola:b.0.3.5"
+    ports:
+      - '8080:8080'
+    networks:
+      - crm-net
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    env_file: environment.env
+    depends_on:
+      - crmDB
+    logging:
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+  Client:
+    image: "osipovskijdima/hola:f.0.3.5"
+    ports:
+      - "80:80"
+    networks:
+      - network-net
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    depends_on:
+      - Service
+    logging:
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+volumes:
+  psqlData:
+    driver: local
+
+networks:
+  network-net:
+    driver: bridge
