@@ -1,0 +1,6 @@
+[submodule "sn_back"]
+	path = sn_back
+	url = https://github.com/DmitriyODS/sn_back
+[submodule "sn_client"]
+	path = sn_client
+	url = https://github.com/DmitriyODS/sn_client
