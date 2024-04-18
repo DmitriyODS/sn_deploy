@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  DB:
+  db:
     image: postgres:16.1-alpine3.19
     restart: always
     environment:
@@ -14,7 +14,26 @@ services:
       - ./backups:/backups:rw
       - psqlData:/var/lib/postgresql/data/:rw
     ports:
-      - '127.0.0.1:5432:5432'
+      - '5432:5432'
+    networks:
+      - network-net
+    logging:
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+  service:
+    image: "osipovskijdima/sn_service:1.0.0"
+    ports:
+      - '8080:8080'
+    networks:
+      - network-net
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    env_file: environment.env
+    depends_on:
+      - db
     logging:
       options:
         max-size: "1024k"
@@ -23,3 +42,7 @@ services:
 volumes:
   psqlData:
     driver: local
+
+networks:
+  network-net:
+    driver: bridge
